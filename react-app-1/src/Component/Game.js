@@ -28,14 +28,20 @@ class Game extends React.Component {
       history: [{
         squares: Array(9).fill(null)
       }],
-      xIsNext: true
+      xIsNext: true,
+      stepNumber: 0
     };
   }
 
   handleClick(i) {
-    const history = this.state.history;
+    // const history = this.state.history;
+    console.log("this.state.history ----------(handleClick)",this.state.history);
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    console.log("this.state.history.slice(0, this.state.stepNumber + 1) ----------(handleClick)",history);
     const current = history[history.length - 1];
+    console.log("current ----------(handleClick)",current);
     const squares1 = current.squares.slice();
+    console.log("squares1 ----------(handleClick)",squares1);
     if (calculateWinner(squares1) || squares1[i]) {
       return;
     }
@@ -44,13 +50,29 @@ class Game extends React.Component {
       history: history.concat([{
         squares:squares1
       }]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
+    console.log("state ----------(handleClick)",this.state);
+    console.log("---------------------------------------------------");
+
+  }
+
+  
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2) === 0
+    });
+    console.log("state ----------(jumpTo)",this.state);
   }
   
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    console.log("history ----------(render)",history);
+    // const current = history[history.length - 1];
+    const current = history[this.state.stepNumber];
+    console.log("current ----------(render)",current);
     const winner = calculateWinner(current.squares);
     const moves = history.map((step, move) => {
       console.log("move",move);
@@ -58,11 +80,14 @@ class Game extends React.Component {
         'Go to move #' + move :
         'Go to game start';
       return (
-        <li>
+        <li  key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
     });
+
+    console.log("moves ----------(moves)",moves);
+
 
     let status;
     if (winner) {
